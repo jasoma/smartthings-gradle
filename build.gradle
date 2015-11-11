@@ -1,0 +1,26 @@
+group 'com.github.jasoma'
+version '1.0-SNAPSHOT'
+
+apply plugin: 'groovy'
+
+ext {
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile 'org.codehaus.groovy:groovy-all:2.4.5'
+    compile 'org.jsoup:jsoup:1.8.3'
+
+    testCompile 'org.spockframework:spock-core:1.0-groovy-2.4'
+    testRuntime "cglib:cglib-nodep:3.1"
+    testRuntime "org.objenesis:objenesis:2.1"
+}
+
+test {
+    testLogging.events 'passed', 'skipped', 'failed'
+    testLogging.exceptionFormat = 'full'
+    environment(username: project.property('smartthings.user'), password: project.property('smartthings.password'))
+}
