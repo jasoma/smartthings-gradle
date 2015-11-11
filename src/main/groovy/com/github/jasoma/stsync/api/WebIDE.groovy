@@ -4,24 +4,40 @@ import org.jsoup.Connection
 import org.jsoup.Jsoup
 
 /**
- * Created by jason on 11/11/15.
+ * Encapsulates the HTTP api exposed by the SmartThings IDE.
  */
 class WebIDE {
 
     private static final String HOST = "https://graph.api.smartthings.com"
     private static final String SESSION_COOKIE_NAME = "JSESSIONID"
 
-    def cookies = [:]
-    def headers = [:]
+    def Map<String, String> cookies = [:]
+    def Map<String, String> headers = [:]
     def loggedIn
 
+    /**
+     * Connect to a specific path on the WebIDE host. If {@link #login(java.lang.String, java.lang.String)} has been called then
+     * the stored headers/cookies needed to authenticate will be set.
+     *
+     * @param path the path to connect to.
+     * @return a configured request containing any stored headers or cookies.
+     */
     def Connection connect(String path) {
         def connection = (path.startsWith("/")) ? Jsoup.connect("$HOST$path") : Jsoup.connect("$HOST/$path");
         connection.followRedirects(false)
         connection.ignoreHttpErrors(true)
+        cookies.each { connection.cookie(it.key, it.value) }
+        headers.each { connection.header(it.key, it.value) }
         return connection
     }
 
+    /**
+     * Authenticates a user with the WebIDE and saves the session data needing to authenticate subsequent requests.
+     *
+     * @param username the username to login with.
+     * @param password the users password.
+     * @throws LoginException if the authentication fails.
+     */
     def void login(String username, String password) throws LoginException {
         def response = connect("j_spring_security_check")
             .data("j_username", username)
