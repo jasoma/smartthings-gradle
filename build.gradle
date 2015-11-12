@@ -1,10 +1,17 @@
+buildscript {
+    repositories {
+        jcenter()
+    }
+}
+
+plugins {
+    id 'java'
+    id 'groovy'
+    id 'com.github.tkruse.groovysh' version '1.0.8'
+}
+
 group 'com.github.jasoma'
 version '1.0-SNAPSHOT'
-
-apply plugin: 'groovy'
-
-ext {
-}
 
 repositories {
     mavenCentral()
