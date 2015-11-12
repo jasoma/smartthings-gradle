@@ -44,27 +44,42 @@ class WebIDE {
             .data("j_password", password)
             .method(Connection.Method.POST)
             .execute()
-        def sessionId = response.cookie(SESSION_COOKIE_NAME)
 
-        if (response.statusCode() != 302 || sessionId == null) {
-            throw new ApiException("Unexpected response during login, remote API may have changed")
+        if (response.statusCode() != 302 || !response.hasCookie(SESSION_COOKIE_NAME)) {
+            throw ApiException.unexpectedResult()
         }
         if (response.header('location')?.contains('authfail')) {
             throw new LoginException()
         }
-        cookies[SESSION_COOKIE_NAME] = sessionId
+        cookies.putAll(response.cookies())
         loggedIn = true
+    }
+
+    /**
+     * Fetches the list of apps for this user.
+     *
+     * @return a list of the apps from the ide server.
+     */
+    def List<SmartAppProject> apps() {
+        ensureLoggedIn()
+        def appsPage = connect('/ide/apps').get()
+        def tableData = appsPage.select('#smartapp-table tbody tr')
+
+        if (tableData.isEmpty()) {
+            throw ApiException.unexpectedResult()
+        }
+        return tableData.collect { SmartAppProject.fromRow(it) }
+    }
+
+    private def ensureLoggedIn() {
+        if (!loggedIn) {
+            throw new IllegalStateException("`login(username, password) must be called before accessing other methods on the WebIDE")
+        }
     }
 
     static class LoginException extends Exception {
         LoginException() {
             super('Could not login to the WebIDE, check your username and password are correct')
-        }
-    }
-
-    static class ApiException extends RuntimeException {
-        ApiException(String message) {
-            super(message)
         }
     }
 

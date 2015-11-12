@@ -17,7 +17,6 @@ class WebIDEIntegrationSpec extends Specification {
         ide.login(username, password)
 
         then:
-        notThrown(Exception)
         ide.loggedIn == true
         ide.cookies.isEmpty() == false
     }
@@ -32,4 +31,12 @@ class WebIDEIntegrationSpec extends Specification {
         name.first().text() == username
     }
 
+    def "the SyncTestApp should be in the projects list"() {
+        when:
+        def apps = ide.apps()
+        def testApp = apps.find { it.name == 'SyncTestApp' }
+
+        then:
+        testApp != null
+    }
 }
