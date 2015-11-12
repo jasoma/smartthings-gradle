@@ -1,8 +1,11 @@
 package com.github.jasoma.stsync.api
 
 import groovy.json.JsonOutput
+import groovy.json.JsonSlurper
 import org.jsoup.Connection
 import org.jsoup.Jsoup
+
+import javax.script.ScriptException
 
 /**
  * Encapsulates the HTTP api exposed by the SmartThings IDE.
@@ -78,17 +81,17 @@ class WebIDE {
      * @param projectId the id of the project to load resources for.
      * @return the resources for that project/
      */
-    def ProjectResources loadResources(String projectId) {
+    def ProjectAndResources loadResources(SmartAppProject project) {
         ensureLoggedIn()
         def connection = connect('/ide/app/getResourceList')
-            .data('id', projectId)
+            .data('id', project.id)
             .ignoreContentType(true)
         def response = connection.execute()
 
         if (response.statusCode() != 200 || !response.contentType().contains('json')) {
             throw ApiException.unexpectedResult()
         }
-        return ProjectResources.fromJson(response.body())
+        return new ProjectAndResources(project, ProjectResources.fromJson(response.body()))
     }
 
     /**
@@ -97,17 +100,16 @@ class WebIDE {
      * @param project the project to get the script for.
      * @return the entire text of the script.
      */
-    def String loadScript(SmartAppProject project) {
+    def String loadScript(ProjectAndResources project) {
         ensureLoggedIn()
-        ProjectResources resources = loadResources(project.id)
-        if (!resources.hasScript()) {
+        if (!project.hasScript()) {
             throw new IllegalStateException("No script file was found in the resources for project ${project.name} (${project.id}). " +
-                    "Full resource list:\n${JsonOutput.prettyPrint(JsonOutput.toJson(resources.rawResources))}")
+                    "Full resource list:\n${JsonOutput.prettyPrint(JsonOutput.toJson(project.rawResources))}")
         }
 
         def connection = connect('/ide/app/getCodeForResource')
             .data('id', project.id)
-            .data('resourceId', resources.getScriptEntry()['id'] as String)
+            .data('resourceId', project.getScriptEntry()['id'] as String)
             .data('resourceType', 'script')
             .method(Connection.Method.POST)
             .ignoreContentType(true)
@@ -117,6 +119,37 @@ class WebIDE {
             throw ApiException.unexpectedResult()
         }
         return response.body();
+    }
+
+    /**
+     * Upload a new version of a script file to a project.
+     *
+     * @param project the project to upload the script to.
+     * @param script the script contents.
+     * @throws ScriptException if the script cannot be compiled on the remote server.
+     */
+    def void uploadScript(ProjectAndResources project, String script) throws ScriptException {
+        ensureLoggedIn()
+        def connection = connect('/ide/app/compile')
+                .data('id', project.id)
+                .data('resourceId', project.getScriptEntry()['id'] as String)
+                .data('resourceType', 'script')
+                .data('code', script)
+                .method(Connection.Method.POST)
+                .ignoreContentType(true)
+        def response = connection.execute()
+
+        if (response.statusCode() != 200 || !response.contentType().concat('json')) {
+            throw ApiException.unexpectedResult()
+        }
+
+        // failed compilations are still a 200 OK so check the returned json for errors
+        def parser = new JsonSlurper()
+        def results = parser.parseText(response.body())
+        def errors = results['errors']
+        if (!errors.isEmpty()) {
+            throw new ScriptException("The script failed to compile on the remote server, errors:\n\t${errors.join('\n\t')}")
+        }
     }
 
     private def ensureLoggedIn() {

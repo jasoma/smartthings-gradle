@@ -14,7 +14,7 @@ class WebIDESpec extends Specification {
         thrown(IllegalStateException)
 
         where:
-        action << [ide.&apps, ide.&loadResources, ide.&loadScript]
+        action << [ide.&apps, ide.&loadResources.curry(null), ide.&loadScript.curry(null), ide.&uploadScript.curry(null, null)]
     }
 
 }
