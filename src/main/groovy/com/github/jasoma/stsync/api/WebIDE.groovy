@@ -1,5 +1,6 @@
 package com.github.jasoma.stsync.api
 
+import groovy.json.JsonOutput
 import org.jsoup.Connection
 import org.jsoup.Jsoup
 
@@ -25,7 +26,7 @@ class WebIDE {
     def Connection connect(String path) {
         def connection = (path.startsWith("/")) ? Jsoup.connect("$HOST$path") : Jsoup.connect("$HOST/$path");
         connection.followRedirects(false)
-        connection.ignoreHttpErrors(true)
+            .ignoreHttpErrors(true)
         cookies.each { connection.cookie(it.key, it.value) }
         headers.each { connection.header(it.key, it.value) }
         return connection
@@ -69,6 +70,53 @@ class WebIDE {
             throw ApiException.unexpectedResult()
         }
         return tableData.collect { SmartAppProject.fromRow(it) }
+    }
+
+    /**
+     * Fetches all the resource descriptors for a project.
+     *
+     * @param projectId the id of the project to load resources for.
+     * @return the resources for that project/
+     */
+    def ProjectResources loadResources(String projectId) {
+        ensureLoggedIn()
+        def connection = connect('/ide/app/getResourceList')
+            .data('id', projectId)
+            .ignoreContentType(true)
+        def response = connection.execute()
+
+        if (response.statusCode() != 200 || !response.contentType().contains('json')) {
+            throw ApiException.unexpectedResult()
+        }
+        return ProjectResources.fromJson(response.body())
+    }
+
+    /**
+     * Fetches the user script for a project.
+     *
+     * @param project the project to get the script for.
+     * @return the entire text of the script.
+     */
+    def String loadScript(SmartAppProject project) {
+        ensureLoggedIn()
+        ProjectResources resources = loadResources(project.id)
+        if (!resources.hasScript()) {
+            throw new IllegalStateException("No script file was found in the resources for project ${project.name} (${project.id}). " +
+                    "Full resource list:\n${JsonOutput.prettyPrint(JsonOutput.toJson(resources.rawResources))}")
+        }
+
+        def connection = connect('/ide/app/getCodeForResource')
+            .data('id', project.id)
+            .data('resourceId', resources.getScriptEntry()['id'] as String)
+            .data('resourceType', 'script')
+            .method(Connection.Method.POST)
+            .ignoreContentType(true)
+        def response = connection.execute()
+
+        if (response.statusCode() != 200 || !response.contentType().contains('groovy')) {
+            throw ApiException.unexpectedResult()
+        }
+        return response.body();
     }
 
     private def ensureLoggedIn() {

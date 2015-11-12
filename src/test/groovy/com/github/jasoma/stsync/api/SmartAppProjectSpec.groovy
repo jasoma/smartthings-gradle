@@ -1,7 +1,5 @@
 package com.github.jasoma.stsync.api
 
-import com.github.jasoma.stsync.api.ApiException
-import com.github.jasoma.stsync.api.SmartAppProject
 import spock.lang.Specification
 
 class SmartAppProjectSpec extends Specification {

@@ -1,18 +1,20 @@
 package com.github.jasoma.stsync.api
-
-import com.github.jasoma.stsync.api.WebIDE
+import spock.lang.Shared
 import spock.lang.Specification
 
 class WebIDESpec extends Specification {
 
-    def ide = new WebIDE()
+    @Shared def ide = new WebIDE()
 
     def "cannot interact with server before login"() {
         when:
-        ide.apps()
+        action.call()
 
         then:
         thrown(IllegalStateException)
+
+        where:
+        action << [ide.&apps, ide.&loadResources, ide.&loadScript]
     }
 
 }

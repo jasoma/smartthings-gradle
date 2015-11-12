@@ -1,5 +1,7 @@
 package com.github.jasoma.stsync.integration
 
+import com.github.jasoma.stsync.api.ProjectResources
+import com.github.jasoma.stsync.api.SmartAppProject
 import com.github.jasoma.stsync.api.WebIDE
 import spock.lang.Shared
 import spock.lang.Specification
@@ -11,6 +13,8 @@ class WebIDEIntegrationSpec extends Specification {
     @Shared String username = System.getenv("username")
     @Shared String password = System.getenv("password")
     @Shared WebIDE ide = new WebIDE()
+    @Shared SmartAppProject testApp
+    @Shared ProjectResources resources
 
     def "login should succeed"() {
         when:
@@ -31,12 +35,30 @@ class WebIDEIntegrationSpec extends Specification {
         name.first().text() == username
     }
 
-    def "the SyncTestApp should be in the projects list"() {
+    def "'SyncTestApp' should be in the projects list"() {
         when:
         def apps = ide.apps()
-        def testApp = apps.find { it.name == 'SyncTestApp' }
+        testApp = apps.find { it.name == 'SyncTestApp' }
 
         then:
         testApp != null
+    }
+
+    def "the resources for the test app should load"() {
+        when:
+        resources = ide.loadResources(testApp.id)
+
+        then:
+        resources.hasScript() == true
+        resources.getScriptEntry() != null
+        resources.getScriptEntry()['id'] != null
+    }
+
+    def "the ide should be able to recover the script for the test app"() {
+        when:
+        def script = ide.loadScript(testApp)
+
+        then:
+        script.readLines().first() == ('// st-gradle test!')
     }
 }
