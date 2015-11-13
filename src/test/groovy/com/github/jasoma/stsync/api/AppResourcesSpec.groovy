@@ -3,7 +3,7 @@ package com.github.jasoma.stsync.api
 import spock.lang.Shared
 import spock.lang.Specification
 
-class ProjectResourcesSpec extends Specification {
+class AppResourcesSpec extends Specification {
 
     @Shared def sample =
 '''
@@ -16,7 +16,7 @@ class ProjectResourcesSpec extends Specification {
 '''
 
     def "it should detect if one of the resources is a groovy script"() {
-        def resources = ProjectResources.fromJson(sample)
+        def resources = AppResources.fromJson(sample)
 
         expect:
         resources.hasScript() == true
@@ -25,7 +25,7 @@ class ProjectResourcesSpec extends Specification {
 
     def "it should report no script if there are no `.groovy` files"() {
         def noCode = sample.replace('.groovy', '')
-        def resources = ProjectResources.fromJson(noCode)
+        def resources = AppResources.fromJson(noCode)
 
         expect:
         resources.hasScript() == false
@@ -34,7 +34,7 @@ class ProjectResourcesSpec extends Specification {
 
     def "it should handle entries not having a `text` field"() {
         def noText = sample.replaceAll('"text":"(.*?)",', '')
-        def resources = ProjectResources.fromJson(noText)
+        def resources = AppResources.fromJson(noText)
 
         expect:
         resources.hasScript() == false

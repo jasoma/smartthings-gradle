@@ -10,7 +10,7 @@ import jdk.nashorn.internal.ir.annotations.Immutable
  */
 @Immutable
 @ToString(includeNames = true, includePackage = false, cache = true)
-class ProjectResources {
+class AppResources {
 
     List<Map> rawResources
 
@@ -20,9 +20,9 @@ class ProjectResources {
      * @param json the raw json response string.
      * @return the constructed resources instance.
      */
-    def static ProjectResources fromJson(String json) {
+    def static AppResources fromJson(String json) {
         def parser = new JsonSlurper()
-        return new ProjectResources(rawResources: (List) parser.parseText(json))
+        return new AppResources(rawResources: (List) parser.parseText(json))
     }
 
     /**

@@ -72,7 +72,7 @@ class WebIDE {
         if (tableData.isEmpty()) {
             throw ApiException.unexpectedResult()
         }
-        return tableData.collect { SmartAppProject.fromRow(it) }
+        return tableData.collect { SmartAppProject.fromRow(it, this) }
     }
 
     /**
@@ -81,7 +81,7 @@ class WebIDE {
      * @param projectId the id of the project to load resources for.
      * @return the resources for that project/
      */
-    def ProjectAndResources loadResources(SmartAppProject project) {
+    def AppResources loadResources(SmartAppProject project) {
         ensureLoggedIn()
         def connection = connect('/ide/app/getResourceList')
             .data('id', project.id)
@@ -91,7 +91,7 @@ class WebIDE {
         if (response.statusCode() != 200 || !response.contentType().contains('json')) {
             throw ApiException.unexpectedResult()
         }
-        return new ProjectAndResources(project, ProjectResources.fromJson(response.body()))
+        return AppResources.fromJson(response.body())
     }
 
     /**
@@ -100,7 +100,7 @@ class WebIDE {
      * @param project the project to get the script for.
      * @return the entire text of the script.
      */
-    def String loadScript(ProjectAndResources project) {
+    def String loadScript(SmartAppProject project) {
         ensureLoggedIn()
         if (!project.hasScript()) {
             throw new IllegalStateException("No script file was found in the resources for project ${project.name} (${project.id}). " +
@@ -128,7 +128,7 @@ class WebIDE {
      * @param script the script contents.
      * @throws ScriptException if the script cannot be compiled on the remote server.
      */
-    def void uploadScript(ProjectAndResources project, String script) throws ScriptException {
+    def void uploadScript(SmartAppProject project, String script) throws ScriptException {
         ensureLoggedIn()
         def connection = connect('/ide/app/compile')
                 .data('id', project.id)

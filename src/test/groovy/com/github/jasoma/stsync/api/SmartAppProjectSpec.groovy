@@ -1,8 +1,11 @@
 package com.github.jasoma.stsync.api
 
+import spock.lang.Shared
 import spock.lang.Specification
 
 class SmartAppProjectSpec extends Specification {
+
+    @Shared def ide = Mock(WebIDE)
 
     def "should not validate if any property is missing"() {
         when:
@@ -13,11 +16,11 @@ class SmartAppProjectSpec extends Specification {
 
         where:
         project << [
-                new SmartAppProject(id: null, name: "2", namespace: "3", status: "4", category: "5"),
-                new SmartAppProject(id: "1", name: null, namespace: "3", status: "4", category: "5"),
-                new SmartAppProject(id: "1", name: "2", namespace: null, status: "4", category: "5"),
-                new SmartAppProject(id: "1", name: "2", namespace: "3", status: null, category: "5"),
-                new SmartAppProject(id: "1", name: "2", namespace: "3", status: "4", category: null)
+                new SmartAppProject(ide: ide, id: null, name: "2", namespace: "3", status: "4", category: "5"),
+                new SmartAppProject(ide: ide, id: "1", name: null, namespace: "3", status: "4", category: "5"),
+                new SmartAppProject(ide: ide, id: "1", name: "2", namespace: null, status: "4", category: "5"),
+                new SmartAppProject(ide: ide, id: "1", name: "2", namespace: "3", status: null, category: "5"),
+                new SmartAppProject(ide: ide, id: "1", name: "2", namespace: "3", status: "4", category: null)
         ]
     }
 
@@ -30,10 +33,10 @@ class SmartAppProjectSpec extends Specification {
 
         where:
         project << [
-                new SmartAppProject(id: '', name: "2", namespace: "3", status: "4", category: "5"),
-                new SmartAppProject(id: '    ', name: "2", namespace: "3", status: "4", category: "5"),
-                new SmartAppProject(id: '  \t', name: "2", namespace: "3", status: "4", category: "5"),
-                new SmartAppProject(id: '\n  ', name: "2", namespace: "3", status: "4", category: "5")
+                new SmartAppProject(ide: ide, id: '', name: "2", namespace: "3", status: "4", category: "5"),
+                new SmartAppProject(ide: ide, id: '    ', name: "2", namespace: "3", status: "4", category: "5"),
+                new SmartAppProject(ide: ide, id: '  \t', name: "2", namespace: "3", status: "4", category: "5"),
+                new SmartAppProject(ide: ide, id: '\n  ', name: "2", namespace: "3", status: "4", category: "5")
         ]
     }
 
