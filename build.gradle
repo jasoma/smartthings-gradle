@@ -7,13 +7,17 @@ buildscript {
 plugins {
     id 'java'
     id 'groovy'
+    id 'application'
     id 'com.github.tkruse.groovysh' version '1.0.8'
+    id 'com.github.johnrengelman.shadow' version '1.2.2'
 }
 
 group 'com.github.jasoma'
 version '1.0-SNAPSHOT'
 
 sourceCompatibility = 1.8
+
+mainClassName = 'com.github.jasoma.stsync.cli.Main'
 
 repositories {
     mavenCentral()
@@ -22,6 +26,7 @@ repositories {
 dependencies {
     compile 'org.codehaus.groovy:groovy-all:2.4.5'
     compile 'org.jsoup:jsoup:1.8.3'
+    compile 'commons-cli:commons-cli:1.3.1'
 
     testCompile 'org.spockframework:spock-core:1.0-groovy-2.4'
     testRuntime "cglib:cglib-nodep:3.1"
@@ -31,5 +36,14 @@ dependencies {
 test {
     testLogging.events 'passed', 'skipped', 'failed'
     testLogging.exceptionFormat = 'full'
-    environment(username: project.property('smartthings.user'), password: project.property('smartthings.password'))
+    exclude '**/integration/*'
 }
+
+task integration(type: Test) {
+    testLogging.events 'passed', 'skipped', 'failed'
+    testLogging.exceptionFormat = 'full'
+    include '**/integration/*'
+    environment(username: project.property('smartthings.username'), password: project.property('smartthings.password'))
+}
+
+build.dependsOn << integration
