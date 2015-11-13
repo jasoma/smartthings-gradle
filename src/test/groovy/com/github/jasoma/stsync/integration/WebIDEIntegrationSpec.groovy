@@ -1,7 +1,7 @@
 package com.github.jasoma.stsync.integration
-import com.github.jasoma.stsync.api.DeviceHandlerProject
-import com.github.jasoma.stsync.api.SmartAppProject
-import com.github.jasoma.stsync.api.WebIDE
+import com.github.jasoma.stsync.ide.DeviceHandlerProject
+import com.github.jasoma.stsync.ide.SmartAppProject
+import com.github.jasoma.stsync.ide.WebIDE
 import spock.lang.Ignore
 import spock.lang.Shared
 import spock.lang.Specification

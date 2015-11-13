@@ -1,4 +1,4 @@
-package com.github.jasoma.stsync.api
+package com.github.jasoma.stsync.ide
 
 import groovy.transform.ToString
 import groovy.transform.TupleConstructor

@@ -1,4 +1,4 @@
-package com.github.jasoma.stsync.api
+package com.github.jasoma.stsync.ide
 
 /**
  * An exception for when the response from the remote server does not have the format or data expected.

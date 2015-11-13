@@ -1,4 +1,4 @@
-package com.github.jasoma.stsync.api
+package com.github.jasoma.stsync.ide
 
 import groovy.json.JsonOutput
 import groovy.json.JsonSlurper
