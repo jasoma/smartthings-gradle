@@ -43,7 +43,7 @@ class Options {
         cli.u(longOpt: 'username', args: 1, argName: 'username', 'specify your SmartThings username')
         cli.p(longOpt: 'password', args: 1, argName: 'password', 'specify your SmartThings password')
         cli.n(longOpt: 'namespace', args: 1, argName: 'namespace', 'specify the namespace for the app or device project')
-        cli.l(longOpt: 'list', args: 1, argName: 'type', 'list all available apps or devices for the user')
+        cli.l(longOpt: 'list', 'list all available apps and devices for the user')
         cli.app(args: 1, argName: 'name', 'create a local project for a SmartApp')
         cli.device(args: 1, argName: 'name', 'create a local project for a DeviceHandler')
         cli.help('show this message')

@@ -24,11 +24,8 @@ class Main {
         else if (options.config) {
             printConfig(options)
         }
-        else if (options.list == 'apps') {
-            listApps(options)
-        }
-        else if (options.list == 'devices') {
-            listDevices(options)
+        else if (options.list) {
+            listProjects(options)
         }
         else if (options.app) {
             createAppProject(options)
@@ -72,22 +69,19 @@ class Main {
     }
 
     /**
-     * Lists all the apps for the user in the Web IDE.
+     * List all app and device handler projects store in the Web IDE
      */
-    def static listApps(Options options) {
+    def static listProjects(Options options) {
         def ide = login(options)
-        def apps = ide.apps();
-        println("Found SmartApps (namespace : name) =>")
-        apps.each { println("${it.namespace} : ${it.name}")}
-    }
+        println("User: ${options.username}\n")
 
-    /**
-     * Lists all the device handlers for the user in the Web IDE.
-     */
-    def static listDevices(Options options) {
-        def ide = login(options)
+        def apps = ide.apps();
+        println("SmartApps (namespace : name) =>")
+        apps.each { println("${it.namespace} : ${it.name}")}
+        println()
+
         def devices = ide.deviceHandlers();
-        println("Found Device Handlers (namespace : name) =>")
+        println("Device Handlers (namespace : name) =>")
         devices.each { println("${it.namespace} : ${it.name}")}
     }
 
