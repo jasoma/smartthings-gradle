@@ -1,0 +1,23 @@
+buildscript {
+    repositories {
+        mavenLocal()
+    }
+    dependencies {
+        classpath 'com.github.jasoma:st-gradle:1.0-SNAPSHOT'
+    }
+}
+
+plugin apply: 'com.github.jasoma.stgradle'
+
+smartthings {
+    ${type} {
+        namespace = '${namespace}'
+        name = '${name}'
+    }
+}
+
+<%
+    if (username || password) out << "// WARNING: Credentials embedded in build script!\n// Consider using the user 'gradle.properties' file instead\n"
+    if (username) { out << "smartthings.username = '$username'\n" }
+    if (password) { out << "smartthings.password = '$password'\n" }
+%>

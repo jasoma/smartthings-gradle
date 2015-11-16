@@ -1,5 +1,7 @@
 package com.github.jasoma.stsync.cli
 
+import org.apache.commons.cli.MissingArgumentException
+
 import java.nio.file.Paths
 
 /**
@@ -109,12 +111,13 @@ examples:
     }
 
     /**
-     * @return {@link #getNamespace()}, fails if the namespace is not present.
+     * @return {@link #getNamespace()}.
+     * @throws MissingArgumentException if a namespace is not present.
      */
-    def requireNamespace() {
+    def requireNamespace() throws MissingArgumentException {
         def namespace = getNamespace()
         if (namespace == null) {
-            throw new RuntimeException("No namespace specified either in the command or the defaults, cannot continue")
+            throw new MissingArgumentException("No namespace specified either in the command or the defaults, cannot continue")
         }
         return namespace
     }
@@ -127,12 +130,13 @@ examples:
     }
 
     /**
-     * @return {@link #getUsername()}, fails if the username is not present.
+     * @return {@link #getUsername()}.
+     * @throws MissingArgumentException if a username is not present.
      */
-    def requireUsername() {
+    def requireUsername() throws MissingArgumentException {
         def username = getUsername()
         if (username == null) {
-            throw new RuntimeException("No username specified either in the command or the defaults, cannot continue")
+            throw new MissingArgumentException("No username specified either in the command or the defaults, cannot continue")
         }
         return username
     }
@@ -145,12 +149,13 @@ examples:
     }
 
     /**
-     * @return {@link #getPassword()}, fails if the password is not present.
+     * @return {@link #getPassword()}.
+     * @throws MissingArgumentException if a password is not present.
      */
-    def requirePassword() {
+    def requirePassword() throws MissingArgumentException {
         def password = getPassword()
         if (password == null) {
-            throw new RuntimeException("No password specified either in the command or the defaults, cannot continue")
+            throw new MissingArgumentException("No password specified either in the command or the defaults, cannot continue")
         }
         return password
     }
@@ -158,4 +163,5 @@ examples:
     def usage() {
         optionParser().usage()
     }
+
 }
