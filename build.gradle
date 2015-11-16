@@ -24,11 +24,12 @@ repositories {
 }
 
 dependencies {
-    compile 'org.codehaus.groovy:groovy-all:2.4.5'
+    compile localGroovy()
+
     compile 'org.jsoup:jsoup:1.8.3'
     compile 'commons-cli:commons-cli:1.3.1'
 
-    testCompile 'org.spockframework:spock-core:1.0-groovy-2.4'
+    testCompile 'org.spockframework:spock-core:1.0-groovy-2.3'
     testRuntime "cglib:cglib-nodep:3.1"
     testRuntime "org.objenesis:objenesis:2.1"
 }
@@ -41,7 +42,12 @@ test {
     exclude '**/integration/*'
 }
 
-task integration(type: Test, dependsOn: 'shadowJar') {
+task cleanTestApps(type: Delete) {
+    delete 'build/tmp/SyncTestApp'
+    delete 'build/tmp/SyncTestDevice'
+}
+
+task integration(type: Test, dependsOn: ['shadowJar', 'cleanTestApps']) {
     testLogging.events 'passed', 'skipped', 'failed'
     testLogging.exceptionFormat = 'full'
     testLogging.showStandardStreams = true
