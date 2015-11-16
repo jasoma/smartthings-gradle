@@ -46,6 +46,7 @@ class Options {
         cli.l(longOpt: 'list', 'list all available apps and devices for the user')
         cli.app(args: 1, argName: 'name', 'create a local project for a SmartApp')
         cli.device(args: 1, argName: 'name', 'create a local project for a DeviceHandler')
+        cli.root(args: 1, argName: 'path', 'directory to create the project in, defaults to the current dir')
         cli.help('show this message')
         cli.footer = """
 examples:
@@ -158,6 +159,13 @@ examples:
             throw new MissingArgumentException("No password specified either in the command or the defaults, cannot continue")
         }
         return password
+    }
+
+    /**
+     * @return where to create the project.
+     */
+    def getRoot() {
+        return raw.root ?: System.getProperty('user.dir')
     }
 
     def usage() {

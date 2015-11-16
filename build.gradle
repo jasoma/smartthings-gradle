@@ -36,14 +36,21 @@ dependencies {
 test {
     testLogging.events 'passed', 'skipped', 'failed'
     testLogging.exceptionFormat = 'full'
+    testLogging.showStandardStreams = true
+
     exclude '**/integration/*'
 }
 
-task integration(type: Test) {
+task integration(type: Test, dependsOn: 'shadowJar') {
     testLogging.events 'passed', 'skipped', 'failed'
     testLogging.exceptionFormat = 'full'
+    testLogging.showStandardStreams = true
+
     include '**/integration/*'
-    environment(username: project.property('smartthings.username'), password: project.property('smartthings.password'))
+    environment(
+            username: project.property('smartthings.username'),
+            password: project.property('smartthings.password'),
+            'stsync.jar': shadowJar.archivePath)
 }
 
 build.dependsOn << integration

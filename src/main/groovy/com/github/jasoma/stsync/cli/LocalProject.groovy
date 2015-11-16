@@ -19,8 +19,8 @@ class LocalProject {
      * @return the local project instance holding the file references.
      * @throws IOException if any of the files or directories cannot be created.
      */
-    def static setup(String name) throws IOException {
-        def projectDir = new File(name)
+    def static setup(Options options, String name) throws IOException {
+        def projectDir = new File(options.root, name)
         if (projectDir.exists()) {
             throw new IOException("Path ${projectDir.absolutePath} already exists")
         }

@@ -91,10 +91,10 @@ class Main {
     def static createAppProject(Options options) {
         def ide = login(options)
         println("Downloading app [${options.requireNamespace()} : ${options.app}]...")
+
         def project = ide.apps().find { it.name == options.app && it.namespace == options.requireNamespace() }
-        System.
-        println("Setting up project in ${Paths.get(System.getProperty('user.dir'), options.app)}...")
-        def localProject = LocalProject.setup(options.app)
+        println("Setting up project in ${Paths.get(options.root, options.app)}...")
+        def localProject = LocalProject.setup(options, options.app)
 
         localProject.projectScript.write(project.downloadScript(), StandardCharsets.UTF_8.name())
         println("Wrote app script to ${localProject.projectScript.absolutePath}...")
@@ -110,11 +110,11 @@ class Main {
      */
     def static createDeviceProject(Options options) {
         def ide = login(options)
-        println("Downloading device handler [${options.requireNamespace()} : ${options.device}]...")
+        println("Setting up project in ${Paths.get(options.root, options.device)}...")
+
         def project = ide.deviceHandlers().find { it.name == options.device && it.namespace == options.requireNamespace() }
-        System.
-                println("Setting up project in ${Paths.get(System.getProperty('user.dir'), options.device)}...")
-        def localProject = LocalProject.setup(options.device)
+        println("Setting up project in ${Paths.get(System.getProperty('user.dir'), options.device)}...")
+        def localProject = LocalProject.setup(options, options.device)
 
         localProject.projectScript.write(project.downloadScript(), StandardCharsets.UTF_8.name())
         println("Wrote device handler script to ${localProject.projectScript.absolutePath}...")
