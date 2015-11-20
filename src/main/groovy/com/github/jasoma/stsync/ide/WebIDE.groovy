@@ -80,7 +80,7 @@ class WebIDE {
      * Fetches all the resource descriptors for a project.
      *
      * @param projectId the id of the project to load resources for.
-     * @return the resources for that project/
+     * @return the resources for that project.
      */
     def AppResources downloadResourcesList(SmartAppProject project) {
         ensureLoggedIn()

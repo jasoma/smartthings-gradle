@@ -1,13 +1,14 @@
 buildscript {
     repositories {
+        mavenCentral()
         mavenLocal()
     }
     dependencies {
-        classpath 'com.github.jasoma:st-gradle:1.0-SNAPSHOT'
+        classpath 'com.github.jasoma:stgradle:1.0-SNAPSHOT'
     }
 }
 
-plugin apply: 'com.github.jasoma.stgradle'
+apply plugin: 'com.github.jasoma.stgradle'
 
 smartthings {
     ${type} {
