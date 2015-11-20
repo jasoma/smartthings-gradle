@@ -9,13 +9,11 @@ import org.jsoup.nodes.Element
  */
 @ToString(includePackage = false, includeNames = true, cache = true)
 @TupleConstructor
-class SmartAppProject {
+class SmartAppProject extends SmartThingsProject {
 
     private WebIDE ide
 
     String id
-    String name
-    String namespace
     String status
     String category
 
@@ -51,41 +49,23 @@ class SmartAppProject {
         }
     }
 
-    /**
-     * Downloads the groovy script file for this project from the WebIDE.
-     *
-     * @return the script contents.
-     */
+    @Override
     def String downloadScript() {
         return ide.downloadScript(this)
     }
 
-    /**
-     * Downloads the groovy script file for this project and writes it out. The destination writer is
-     * <strong>not</strong> closed by this operation.
-     *
-     * @param destination the writer to output the script with.
-     */
+    @Override
     def void downloadScript(Writer destination) {
         destination.write(downloadScript())
         destination.flush()
     }
 
-    /**
-     * Uploads a new version of the script to the WebIDE.
-     *
-     * @param script the script contents to upload.
-     */
+    @Override
     def void uploadScript(String script) {
         ide.uploadScript(this, script)
     }
 
-    /**
-     * Uploads a new version of the script from an external source to the WebIDE. The source reader is
-     * <strong>not</strong> closed by this operation.
-     *
-     * @param source the source to read the script contents from.
-     */
+    @Override
     def void uploadScript(Reader source) {
         uploadScript(source.readLines().join("\n"))
     }

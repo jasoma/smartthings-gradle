@@ -1,4 +1,6 @@
 package com.github.jasoma.stsync.gradle
+
+import com.github.jasoma.stsync.ide.SmartThingsProject
 import com.github.jasoma.stsync.ide.WebIDE
 import groovy.transform.PackageScope
 import groovy.transform.PackageScopeTarget
@@ -27,8 +29,6 @@ class SmartThingsExtension {
      */
     String password
 
-    @PackageScope ProjectType type
-
     /**
      * The namespace of the project being built.
      */
@@ -38,6 +38,11 @@ class SmartThingsExtension {
      * The name of the project build built.
      */
     String name
+
+    /**
+     * The type of project beind built, app or device handler.
+     */
+    ProjectType type
 
     /**
      * A logged in {@link WebIDE} instance.
@@ -51,7 +56,7 @@ class SmartThingsExtension {
     /**
      * The project instance loaded from the ide.
      */
-    @Lazy def project = {
+    @Lazy SmartThingsProject project = {
         return (type == ProjectType.App) ? findApp() : findDevice()
     }()
 
