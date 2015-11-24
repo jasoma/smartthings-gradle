@@ -14,7 +14,7 @@ class Main {
     def static void main(String[] args) {
         def options = Options.parse(args)
 
-        if (options.help) {
+        if (options.help || args.length == 0) {
             options.usage()
         }
         else if (options.config && [options.raw.namespace, options.raw.username, options.raw.password].any()) {

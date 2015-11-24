@@ -1,3 +1,5 @@
+import org.apache.tools.ant.filters.ReplaceTokens
+
 buildscript {
     repositories {
         jcenter()
@@ -9,12 +11,13 @@ plugins {
     id 'groovy'
     id 'application'
     id 'maven'
+    id 'signing'
     id 'com.github.tkruse.groovysh' version '1.0.8'
     id 'com.github.johnrengelman.shadow' version '1.2.2'
 }
 
 group 'com.github.jasoma'
-version '1.0-SNAPSHOT'
+version '1.0.0'
 
 sourceCompatibility = 1.8
 
@@ -69,4 +72,71 @@ task integration(type: Test, dependsOn: ['shadowJar', 'cleanTestApps']) {
             'stsync.jar': shadowJar.archivePath)
 }
 
+processResources {
+    filter(ReplaceTokens, tokens: [version: project.version])
+}
+
 build.dependsOn << integration
+
+def publishUrl() {
+    if (project.version.endsWith('SNAPSHOT')) {
+        'https://oss.sonatype.org/content/repositories/snapshots'
+    } else {
+        'https://oss.sonatype.org/service/local/staging/deploy/maven2/'
+    }
+}
+
+task docJar(type: Jar, dependsOn: 'groovydoc') {
+    classifier = 'javadoc'
+    from groovydoc.destinationDir
+}
+
+task sourceJar(type: Jar) {
+    from sourceSets.main.allSource
+    classifier = 'sources'
+}
+
+artifacts {
+    archives docJar, sourceJar
+}
+
+signing {
+    sign configurations.archives
+}
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            beforeDeployment { deployment -> signing.signPom(deployment) }
+            repository(url: publishUrl()) {
+                authentication(userName: project.property('ossrhUser'), password: project.property('ossrhPassword'))
+            }
+            pom.project {
+                name 'SmartThings Gradle'
+                description 'Gradle plugin for local authoring of SmartThings projects'
+                url 'https://github.com/jasoma/smartthings-gradle'
+                scm {
+                    connection 'scm:git:https://github.com/jasoma/smartthings-gradle.git'
+                    developerConnection 'scm:git:git@github.com:jasoma/smartthings-gradle.git'
+                    url 'https://github.com/jasoma/smartthings-gradle.git'
+                }
+                licenses {
+                    license {
+                        name 'The MIT License (MIT)'
+                        url 'http://opensource.org/licenses/MIT'
+                        distribution 'repo'
+                    }
+                }
+                developers {
+                    developer {
+                        id 'jmaher'
+                        name 'Jason Maher'
+                        email 'jason@jasonmaher.me'
+                    }
+                }
+            }
+        }
+    }
+}
+
+task release(dependsOn: ['build', 'uploadArchives'])
